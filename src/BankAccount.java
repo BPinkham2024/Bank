@@ -1,32 +1,25 @@
 public class BankAccount {
 
-    private String accName;
+    private final String accName;
     private double balance;
-    private int pin = (int) (9999 * Math.random() + 1000);;
+    private final int pin = (int) (9999 * Math.random() + 1000);
 
     public BankAccount(String n) {
         accName = n;
-    }
-
-    public BankAccount(String n, double bal) {
-        accName = n;
-        balance = bal;
     }
 
     public boolean pinMatch(int inPin) {
         return inPin == pin;
     }
 
-    public double withdraw(double draw) {
+    public void withdraw(double draw) {
         if(balance > draw) {
             balance -= draw;
         }
-        return balance;
     }
 
-    public double deposit(double dep) {
+    public void deposit(double dep) {
         balance += dep;
-        return balance;
     }
 
     public String getAccName() {
@@ -43,5 +36,13 @@ public class BankAccount {
 
     public int getPin() {
         return pin;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("""
+                \nName: %s
+                Pin: %04d
+                Balance: %.02f""", accName, pin, balance);
     }
 }

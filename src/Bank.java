@@ -1,4 +1,4 @@
-import java.util.Arrays;
+import java.util.Scanner;
 
 public class Bank {
     private final String name;
@@ -26,11 +26,42 @@ public class Bank {
         StringBuilder accountList = new StringBuilder();
         for(BankAccount ba : accounts) {
             if(ba != null) {
-                accountList.append(ba.getAccName());
+                accountList.append(ba).append("\n");
             }
         }
 
-        return accountList.toString();
+        return accountList.substring(0, accountList.length() - 2);
+    }
+
+    public BankAccount findAccount(int pin) {
+        for (BankAccount account : accounts) {
+            if (account != null && account.pinMatch(pin)) {
+                return account;
+            }
+        }
+        return null;
+    }
+
+    public static void deposit(BankAccount ba) throws InterruptedException {
+        Scanner reader = new Scanner(System.in);
+        System.out.print("\n\nHow much would you like to deposit: $");
+        try {
+            ba.deposit(reader.nextDouble());
+        } catch(Exception e) {
+            System.out.println("That is not a valid number");
+            Thread.sleep(1000);
+        }
+    }
+
+    public static void withdraw(BankAccount ba) throws InterruptedException {
+        Scanner reader = new Scanner(System.in);
+        System.out.print("\n\nHow much would you list to withdraw: $");
+        try {
+            ba.withdraw(reader.nextDouble());
+        } catch(Exception e) {
+            System.out.println("That is not a valid number");
+            Thread.sleep(1000);
+        }
     }
 
     public String toString() {
