@@ -32,7 +32,6 @@ public class BankClient {
                         clearScreen();
                     }
                     case 2 -> {
-                        clearScreen();
                         System.out.print("Enter the admin pin: ");
                         if (reader.nextInt() == 99999) {
                             boolean shouldRun = true;
@@ -42,7 +41,8 @@ public class BankClient {
                                     --------------------------%s Admin Console--------------------------
                                     1. View all accounts
                                     2. Change an account balance
-                                    3. Leave
+                                    3. Edit an account loan
+                                    4. Leave
                                     
                                     Option:\s""", bank.getName());
 
@@ -83,7 +83,7 @@ public class BankClient {
                                                     Thread.sleep(5000);
                                                 }
                                                 case 3 -> {
-                                                    System.out.print("\n\nWhat would you like to change the balance to: ");
+                                                    System.out.print("\n\nWhat would you like to change the balance to: $");
                                                     try {
                                                         ba.setBalance(reader.nextDouble());
                                                         System.out.printf("The balance is now %.02f", ba.getBalance());
@@ -98,7 +98,94 @@ public class BankClient {
                                             Thread.sleep(1000);
                                         }
                                     }
-                                    case 3 -> shouldRun = false;
+                                    case 3 -> {
+                                        System.out.print("\n\nEnter the account pin: ");
+                                        int accPin = reader.nextInt();
+
+                                        if(bank.findAccount(accPin) != null) {
+                                            boolean stillRun = true;
+                                            while(stillRun) {
+                                                clearScreen();
+                                                BankAccount ba = bank.findAccount(accPin);
+                                                Loans loan = new Loans(ba.getLoans());
+
+                                                System.out.printf("""
+                                                    --------------------------%s Admin Console (%s's Account)--------------------------
+                                                    %s
+                                                    Interest rate: %.02f
+                                                    
+                                                    What would you like to change:
+                                                    
+                                                    1. Total Loans
+                                                    2. Debt
+                                                    3. Interest Rate
+                                                    4. Leave
+                                                    
+                                                    Option:\s""", bank.getName(), ba.getAccName(), loan, loan.getInterestRate());
+
+                                                switch(reader.nextInt()) {
+                                                    case 1 -> {
+
+                                                        try {
+                                                            if(ba.getBalance() - loan.getLoanTotal() >= 0) {
+                                                                System.out.print("\n\nWhat would you like to set the total loans to: $");
+                                                                loan.setLoanTotal(reader.nextDouble());
+                                                                System.out.printf("""
+                                                                \nHere is the new loan:
+                                                                %s
+                                                                Interest Rate: %.02f""", loan, loan.getInterestRate());
+
+                                                                ba.withdraw(ba.getLoans().getLoanTotal());
+                                                                ba.deposit(loan.getLoanTotal());
+                                                                ba.setLoans(loan);
+
+                                                            } else {
+                                                                System.out.println("You have spent too much of the loan to be able to change it");
+                                                            }
+                                                        } catch(Exception e) {
+                                                            System.out.println("That is not a valid number");
+                                                        }
+
+                                                        Thread.sleep(1500);
+                                                    }
+                                                    case 2 -> {
+                                                        System.out.print("\n\nWhat would you like to set the loan debt to: $");
+                                                        try {
+                                                            loan.setDebt(reader.nextDouble());
+                                                            System.out.printf("""
+                                                            \nHere is the new loan:
+                                                            %s
+                                                            Interest Rate: %.02f""", loan, loan.getInterestRate());
+                                                        } catch(Exception e) {
+                                                            System.out.println("That is not a valid number");
+                                                        }
+
+                                                        Thread.sleep(1500);
+                                                    }
+                                                    case 3 -> {
+                                                        System.out.print("\n\nWhat would you like to set the interest rate to: ");
+                                                        try {
+                                                            loan.setInterestRate(reader.nextDouble());
+                                                            System.out.printf("""
+                                                            \nHere is the new loan:
+                                                            %s
+                                                            Interest Rate: %.02f""", loan, loan.getInterestRate());
+                                                        } catch(Exception e) {
+                                                            System.out.println("That is not a valid number");
+                                                        }
+
+                                                        Thread.sleep(1500);
+                                                    }
+                                                    case 4 -> stillRun = false;
+                                                }
+                                            }
+
+                                        } else {
+                                            System.out.println("That is not a valid pin");
+                                            Thread.sleep(1000);
+                                        }
+                                    }
+                                    case 4 -> shouldRun = false;
                                 }
                             }
                         }
@@ -116,7 +203,8 @@ public class BankClient {
                                         
                                         1. Deposit
                                         2. Withdraw
-                                        3. Leave
+                                        3. Take a loan
+                                        4. Leave
                                         
                                         Option:\s""", ba.getAccName());
 
@@ -126,12 +214,20 @@ public class BankClient {
                                             Bank.deposit(ba);
                                             System.out.printf("Your balance is now %.02f", ba.getBalance());
                                             Thread.sleep(5000);
-                                        }
-                                        case 2 -> {
+                                        } case 2 -> {
                                             Bank.withdraw(ba);
                                             System.out.printf("Your balance is now %.02f", ba.getBalance());
                                             Thread.sleep(5000);
+                                        } case 3 -> {
+                                            clearScreen();
+                                            System.out.print("Enter your loan amount: $");
+                                            ba.takeLoans(reader.nextInt());
+                                            ba.deposit(ba.getLoans().getLoanTotal());
+                                            System.out.println("Here is your loan information:\n" + ba.getLoans() +
+                                                    "\n\nIf there is anything wrong, please immediately contact your bank admin.");
+                                            Thread.sleep(5000);
                                         }
+
                                     }
                                 } catch(Exception e) {
                                     System.out.println("That is not a valid number");
@@ -162,7 +258,7 @@ public class BankClient {
     }
 
     public static void clearScreen() {
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < 20; i++) {
             System.out.println();
         }
     }

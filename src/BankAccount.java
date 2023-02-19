@@ -2,6 +2,7 @@ public class BankAccount {
 
     private final String accName;
     private double balance;
+    private Loans loans;
     private final int pin = (int) (9999 * Math.random() + 1000);
 
     public BankAccount(String n) {
@@ -13,9 +14,20 @@ public class BankAccount {
     }
 
     public void withdraw(double draw) {
-        if(balance > draw) {
+        if(balance >= draw) {
             balance -= draw;
         }
+    }
+
+    public void takeLoans(double loan) {
+        loans = new Loans(loan);
+    }
+
+    public void setLoans(Loans loan) {
+        loans = new Loans(loan);
+    }
+    public Loans getLoans() {
+        return loans;
     }
 
     public void deposit(double dep) {
@@ -38,7 +50,6 @@ public class BankAccount {
         return pin;
     }
 
-    @Override
     public String toString() {
         return String.format("""
                 \nName: %s
